@@ -29,13 +29,31 @@ export default {
   ** Nuxt.js modules
   ** Doc: https://nuxtjs.org/guide/modules
   */
+  buildModules: [
+    '@nuxtjs/vuetify',
+  ],
+
   modules: [
+    '@nuxtjs/axios',
     // Doc: https://http.nuxtjs.org
     '@nuxt/http',
     // TODO: Remove it if you want to eject from codeSandbox
     './codesandbox'
   ],
 
+  serverMiddleware: [
+    { path: "/api", handler: require("body-parser").json() },
+    {
+      path: "/api",
+      handler: (req, res, next) => {
+        const url = require("url");
+        req.query = url.parse(req.url, true).query;
+        req.params = { ...req.query, ...req.body };
+        next();
+      }
+    },
+    { path: "/api", handler: "~/serverMiddleware/api-server.js" }
+  ],
   /*
   ** HTTP module configuration
   */
